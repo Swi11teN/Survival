@@ -2,22 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    private float moveSpeed = 10;
+    private float moveSpeed = 9;
     private Vector2 m_Move;
     private float rotateSpeed = 10;
     private Vector2 m_Look;
     private Vector2 m_Rotate;
-    public HealthnessBar hb;
+    private Animator animator;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -40,7 +40,14 @@ public class PlayerController : MonoBehaviour
     private void Move(Vector2 direction)
     {
         if (direction.sqrMagnitude < 0.01)
+        {
+            animator.SetBool("isRun", false);
             return;
+        }
+        else
+        {
+            animator.SetBool("isRun", true);
+        }
         var scaledMoveSpeed = moveSpeed * Time.deltaTime;
 
         var move = Quaternion.Euler(0, transform.eulerAngles.y, 0) * new Vector3(direction.x, 0, direction.y);
@@ -59,9 +66,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Enemy")) 
+        if (collision.gameObject.CompareTag("Obstacles"))
         {
-            hb.TakeDamage();
+            animator.SetBool("isPush", true);
+        }
+        else
+        {
+            animator.SetBool("isPush", false);
         }
     }
 }
